@@ -1,0 +1,14 @@
+{
+    "name": "cyber-client",
+    "dependencies": {
+        "electron": "^1.7.9"
+    },
+    "scripts": {
+        "start": "electron ."
+    },
+    "main": "main.js",
+    "version": "1.1.1",
+    "license": "MIT",
+    "description": "Cliente para el control de computadoras de un ciber cafe.",
+    "author": "Edel Custodio Frias"
+}
