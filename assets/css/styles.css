@@ -1,0 +1,8 @@
+body{
+    padding: 20px;
+}
+
+.your-clock {
+    zoom: 0.5;
+    -moz-transform: scale(0.5)
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Client</title>
+
+    
+    <link rel="stylesheet" href="./assets/css/flipclock.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./node_modules/font-awesome/css/font-awesome.min.css">
+  </head>
+  <body>
+    <div class="container">
+        <div class="row">
+          <div class="col-sm-12 col-md-12">
+              <div class="your-clock"></div>
+          </div>  
+          <div class="row">
+            <div class="col-sm-3 offset-md-3">
+                <a id="startClock" class="btn btn-primary"><i class="fa fa-clock-o" aria-hidden="true"></i> Start</a>
+            </div>
+            <div class="col-sm-3 offset-md-3">
+                <a id="stopClock" class="btn btn-danger"><i class="fa fa-clock-o" aria-hidden="true"></i> Stop</a>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+    
+
+    
+    
+    <script>
+      // You can also require other files to run in this process
+      require('./renderer.js')
+      
+    </script>
+  </body>
+</html>
