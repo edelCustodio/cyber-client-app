@@ -1,82 +1,93 @@
 const electron = require('electron');
 const path = require('path');
 const url = require('url');
-
+const CyberClient = require('./assets/js/server_side/cyber-client');
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-const ipc = electron.ipcMain
-const Menu = electron.Menu
-const Tray = electron.Tray
-
+var server = null;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+
+const Menu = electron.Menu
+const Tray = electron.Tray
+
 let appIcon = null
 
-function createWindow () {
-  
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-      
-    width: 800, 
-    height: 600
-      //width: 300, 
-      //height: 150,
-      //transparent: true
-      //frame: false
-    })
+var Main = {
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
+  createWindow: function () {
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+      width: 800, 
+      height: 600  
+      // width: 320, 
+      // height: 110,
+      // transparent: true,
+      // frame: false,
+      // toolbar: false
+    })
+    
+    // and load the index.html of the app.
+    mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'start.html'),
     protocol: 'file:',
     slashes: true
-  }))
+    }))
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+    //mainWindow.setPosition(1,3)
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
+    // Open the DevTools.
+    //mainWindow.webContents.openDevTools()
+
+
+    let server = require('./assets/js/server_side/api')
+
+    // Emitted when the window is closed.
+    mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
-  });
+    });
 
-  //Tray icon
-  ipc.on('put-in-tray', function (event) {
-    const iconName = process.platform === 'win32' ? 'windows-icon.png' : 'iconTemplate.png'
+    const iconName = process.platform === 'win32' ? 'app.ico' : 'app.ico'
     const iconPath = path.join(__dirname, iconName)
-    
     appIcon = new Tray(iconPath)
-    
     const contextMenu = Menu.buildFromTemplate([{
-      label: 'Remove',
-      click: function () {
-        event.sender.send('tray-removed')
-      }
+    label: 'Remove',
+    click: function () {
+      event.sender.send('tray-removed')
+    }
     }])
-
     appIcon.setToolTip('Electron Demo in the tray.')
     appIcon.setContextMenu(contextMenu)
-  })
 
-  ipc.on('remove-tray', function () {
-    appIcon.destroy()
-  })
+    //Create cyber cafe server
+    CyberClient.createCyberClient(mainWindow);
+  },
 
-  //Create cyber cafe server
-  createCyberClient();
+  getMainWindow: function () {
+    return mainWindow;
+  },
+
+  getApp: function () {
+    return app;
+  }
 }
+/*
+function createWindow () {
+  
+  
+}*/
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', Main.createWindow)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -90,54 +101,9 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
+  if (Main.createWindow === null) {
+    Main.createWindow()
   }
 })
 
-//
-app.on('window-all-closed', function () {
-  if (appIcon) appIcon.destroy()
-})
-
-
-
-/**
- * Create cyber client
- */
-function createCyberClient() {
-  var net = require('net');
-  var host = '127.0.0.1';
-  var port = 6969;
-  
-  var client = new net.Socket();
-  client.connect(port, host, function() {
-  
-      console.log('CONNECTED TO: ' + host + ':' + port);
-      // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-      client.write('I am Chuck Norris!');
-  
-  });
-    
-  // Add a 'data' event handler for the client socket
-  // data is what the server sent to this socket
-  client.on('data', function(data) {
-      
-      console.log('DATA: ' + data);
-      // Close the client socket completely
-      //client.destroy();
-      
-  });
-  
-  // Add a 'close' event handler for the client socket
-  client.on('close', function() {
-      console.log('Connection closed');
-  });
-  
-
-  client.on('error', function(data){
-    console.error(data.stack);
-    console.log("Node NOT Exiting...");
-  });
-  
-}
+module.exports = Main;

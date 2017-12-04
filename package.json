@@ -1,12 +1,17 @@
 {
   "name": "cyber-client",
   "dependencies": {
-    "bootstrap": "^3.3.7",
-    "electron": "^1.7.9",
-    "flipclock": "^0.7.8",
-    "font-awesome": "^4.7.0",
-    "jquery": "^3.2.1",
-    "jquery-countdown": "^2.2.0"
+    "body-parser": "1.18.2",
+    "bootstrap": "3.3.7",
+    "bootstrap-validator": "0.11.9",
+    "electron": "1.7.9",
+    "express": "4.16.2",
+    "flipclock": "0.7.8",
+    "font-awesome": "4.7.0",
+    "ip": "1.1.5",
+    "jquery": "3.2.1",
+    "jquery-countdown": "2.2.0",
+    "tedious": "2.1.1"
   },
   "scripts": {
     "start": "electron ."
@@ -18,5 +23,9 @@
   "author": "Edel Custodio Frias",
   "devDependencies": {
     "electron": "~1.7.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edelCustodio/cyber-client-app.git"
   }
 }

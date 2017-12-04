@@ -2,6 +2,11 @@ body{
     padding: 20px;
 }
 
+html, body {
+    background: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+
 .your-clock {
     zoom: 0.5;
     -moz-transform: scale(0.5)
