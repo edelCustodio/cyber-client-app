@@ -21,6 +21,7 @@ var Main = {
 
   createWindow: function () {
     // Create the browser window.
+    
     mainWindow = new BrowserWindow({
       width: 800, 
       height: 600  
@@ -33,9 +34,9 @@ var Main = {
     
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'start.html'),
-    protocol: 'file:',
-    slashes: true
+      pathname: path.join(__dirname, 'start.html'),
+      protocol: 'file:',
+      slashes: true
     }))
 
     //mainWindow.setPosition(1,3)
