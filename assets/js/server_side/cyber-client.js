@@ -26,14 +26,11 @@ const ip = require('ip');
         // data is what the server sent to this socket
         client.on('data', function(data) {
             var textData = data.toString('utf8');
-            console.log('DATA: ');
-            console.log(textData);
-            // Close the client socket completely
-            //client.destroy();
-            
-            if(textData == 'start'){
-                mainWindow.webContents.send('start', 1);
-            }else{
+            var jsonData = JSON.parse(textData)
+
+            if (jsonExample.start) {
+                mainWindow.webContents.send('start', textData);
+            } else {
                 mainWindow.webContents.send('stop', 0);
             }
         });

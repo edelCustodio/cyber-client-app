@@ -2,6 +2,9 @@ const electron = require('electron');
 const path = require('path');
 const url = require('url');
 const CyberClient = require('./assets/js/server_side/cyber-client');
+const fs = require('fs')
+let Store = require('./assets/js/server_side/file-helper')
+
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
@@ -20,31 +23,44 @@ let appIcon = null
 var Main = {
 
   createWindow: function () {
-    // Create the browser window.
     
+    var fileName = 'start.html';
+    var width = 800;
+    var height = 600;
+
+    var fileExist = false;
+    //comprobar si existe el archivo user-preferences.json
+    if(fileConfigExist()) {
+      fileName = 'index.html'
+      //var store = new Store();
+      width = 247;
+      height = 60;
+      fileExist = true;
+    }
+
+    // Create the browser window.
     mainWindow = new BrowserWindow({
-      width: 800, 
-      height: 600  
-      // width: 320, 
-      // height: 110,
-      // transparent: true,
-      // frame: false,
-      // toolbar: false
+      width: width, 
+      height: height,
+       transparent: true,
+       frame: false,
+       toolbar: false,
+       skipTaskbar: true,
+       alwaysOnTop: true,
+       resizable: false
     })
+
+    // if(fileExist)
+    //  mainWindow.setPosition(1, 3)
     
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'start.html'),
+      pathname: path.join(__dirname, fileName),
       protocol: 'file:',
       slashes: true
     }))
 
-    //mainWindow.setPosition(1,3)
-
-    // Open the DevTools.
-    //mainWindow.webContents.openDevTools()
-
-
+    //API
     let server = require('./assets/js/server_side/api')
 
     // Emitted when the window is closed.
@@ -55,17 +71,20 @@ var Main = {
     mainWindow = null
     });
 
+    //Try icon
     const iconName = process.platform === 'win32' ? 'app.ico' : 'app.ico'
     const iconPath = path.join(__dirname, iconName)
     appIcon = new Tray(iconPath)
-    const contextMenu = Menu.buildFromTemplate([{
-    label: 'Remove',
-    click: function () {
-      event.sender.send('tray-removed')
-    }
-    }])
-    appIcon.setToolTip('Electron Demo in the tray.')
-    appIcon.setContextMenu(contextMenu)
+    
+    // const contextMenu = Menu.buildFromTemplate([{
+    // label: 'Remove',
+    // click: function () {
+    //   event.sender.send('tray-removed')
+    // }
+    // }])
+    
+    appIcon.setToolTip('Skynet client.')
+    //appIcon.setContextMenu(contextMenu)
 
     //Create cyber cafe server
     CyberClient.createCyberClient(mainWindow);
@@ -77,13 +96,18 @@ var Main = {
 
   getApp: function () {
     return app;
-  }
+  },
+
+  
 }
-/*
-function createWindow () {
+
+function fileConfigExist() {
+  const userDataPath = (electron.app || electron.remote.app).getPath('userData');
   
-  
-}*/
+  const pathFile = path.join(userDataPath, 'user-preferences.json');
+
+  return fs.existsSync(pathFile);
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

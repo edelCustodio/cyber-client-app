@@ -1,4 +1,5 @@
 const electron = require('electron');
+const BrowserView = electron.BrowserView
 let currentWindow = null;
 let app = null;
 let Store = require('./file-helper')
@@ -15,10 +16,7 @@ const BrowserWindow = electron.BrowserWindow
         // 800x600 is the default size of our window
         windowBounds: { 
             width: 320, 
-            height: 110,
-            transparent: true,
-            frame: false,
-            toolbar: false
+            height: 110
         },
         IPServer: ''
     }
@@ -37,12 +35,11 @@ class WindowHelper {
 
     setUserPreferences() {
         currentWindow = Main.getMainWindow();
-        app = Main.getApp();
 
         let { width, height, transparent, frame, toolbar } = store.get('windowBounds');
-        currentWindow.setSize(width, height); // = new BrowserWindow({ width, height, transparent, frame, toolbar });
+        currentWindow.setSize(width, height);
         currentWindow.setPosition(1,3)
-        app.commandLine.appendSwitch('enable-transparent-visuals');
+
     }
 }
 

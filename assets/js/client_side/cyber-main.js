@@ -10,33 +10,41 @@ var clock = $('.your-clock').FlipClock({
 
 $(document).ready(function () {
     clock.stop();
+
+    //move the clock lower-down right corner
+    window.moveTo(screen.width, screen.height + 20);
 });
 
-$("#stopClock").click(function(){
-    clock.stop();
+//Start clock depending of values
+function initializeClock(params) {
+    var currentDate = new Date();
+    var diff = 0;
     
-    var endDate = new Date();
-    console.log(endDate);
-    console.log(clock.getTime().time);
-    console.log("clock stopped!");
-    clock.reset();
-});
+    if(params.minutes > 0) {
+        var countDownValue = (currentDate.getTime() + (params.minutes * 60 * 1000));    
+        diff = (countDownValue/1000) - (currentDate.getTime()/1000);
+    }
 
-$("#startClock").click(function(){
-    clock.start();
-    var startDate = new Date();
-    console.log(startDate);
-    console.log("clock started!");
-});
+    //Save record on database start time
 
+
+    //Start clock
+    clock = $('.your-clock').FlipClock(diff, {
+        language:'es-es',
+        countdown: params.countDown
+    });
+}
 
 ipcRenderer.on('start', (event, arg) => {
-    clock.start();
-    console.log(arg);
+    var params = JSON.parse(arg);
+    initializeClock(params);
 });
 
 ipcRenderer.on('stop', (event, arg) => {  
+    //Save record on database end time
+
+
+    //Stop clock
     clock.stop();
-    console.log(arg);
 });
 

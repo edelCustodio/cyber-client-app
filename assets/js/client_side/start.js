@@ -9,11 +9,13 @@ $(document).ready(function () {
 })
 
 function getFileConfig(ipAddress) {
+
     $.post(apiURL + '/fileExists', {ipAddress: ipAddress}, function(data){
         if (data.result) {
             document.location.href = "index.html";
         }
     })
+   
 }
 
 $('#frIPAddress').validator().on('submit', function (e) {
