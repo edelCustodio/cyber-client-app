@@ -2,14 +2,15 @@ const Desktop = require('../models/computadora')
 const os = require('os');
 const net = require('net');
 const ip = require('ip');
+let host = '';
+const port = 6969;
 
  var CyberClient = {
 
     createCyberClient: function(win) {
         mainWindow = win;
         var client = new net.Socket();
-        var host = this.getIPServer();
-        var port = 6969;
+        host = this.getIPServer();
 
         client.connect(port, host, function() {
         
@@ -26,9 +27,9 @@ const ip = require('ip');
         // data is what the server sent to this socket
         client.on('data', function(data) {
             var textData = data.toString('utf8');
-            var jsonData = JSON.parse(textData)
+            var jsonData = JSON.parse(textData);
 
-            if (jsonExample.start) {
+            if (jsonData.start) {
                 mainWindow.webContents.send('start', textData);
             } else {
                 mainWindow.webContents.send('stop', 0);
@@ -37,6 +38,13 @@ const ip = require('ip');
         
         // Add a 'close' event handler for the client socket
         client.on('close', function() {
+
+            //Obtener info computadora y actualizar estado computadora
+            Desktop.getDesktopByIPAddress(host).then(result => {
+                var desktop = result[0];
+                Desktop.updateDesktopOnline(desktop.idComutadora, false);
+            });
+            
             console.log('Connection closed');
         });
         

@@ -33,12 +33,15 @@ class WindowHelper {
         store.set('IPServer', IPServer);
     }
 
+    fileConfigExists() {
+        return store.exists();
+    }
+
     setUserPreferences() {
         currentWindow = Main.getMainWindow();
 
         let { width, height, transparent, frame, toolbar } = store.get('windowBounds');
         currentWindow.setSize(width, height);
-        currentWindow.setPosition(1,3)
 
     }
 }

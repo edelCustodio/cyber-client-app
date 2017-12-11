@@ -12,6 +12,7 @@ function getFileConfig(ipAddress) {
 
     $.post(apiURL + '/fileExists', {ipAddress: ipAddress}, function(data){
         if (data.result) {
+            sessionStorage.setItem('desktop', JSON.stringify(data.data));
             document.location.href = "index.html";
         }
     })

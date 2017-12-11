@@ -1,8 +1,11 @@
+
+
 window.$ = window.jQuery = require('jquery');
 var FlipClock = require('./assets/js/flipclock.js');
 var bootstrap = require('bootstrap');
 var { ipcRenderer, remote } = require('electron');  
-
+var desktopInfo = {}
+let apiURL = "http://localhost:7070";
 
 var clock = $('.your-clock').FlipClock({
     language:'es-es'
@@ -10,6 +13,9 @@ var clock = $('.your-clock').FlipClock({
 
 $(document).ready(function () {
     clock.stop();
+
+    if(sessionStorage.getItem('desktop') !== null)
+        desktopInfo = JSON.parse(sessionStorage.getItem('desktop'));
 
     //move the clock lower-down right corner
     window.moveTo(screen.width, screen.height + 20);
@@ -26,7 +32,7 @@ function initializeClock(params) {
     }
 
     //Save record on database start time
-
+    saveDesktopRecord(currentDate);
 
     //Start clock
     clock = $('.your-clock').FlipClock(diff, {
@@ -41,10 +47,21 @@ ipcRenderer.on('start', (event, arg) => {
 });
 
 ipcRenderer.on('stop', (event, arg) => {  
+    var currentDate = new Date();
     //Save record on database end time
-
+    saveDesktopRecord(currentDate);
 
     //Stop clock
-    clock.stop();
+    //clock.stop();
+
+    //Reset clock
+    clock.reset();
 });
 
+
+function saveDesktopRecord(fecha) {
+    var data = { idComputadora: desktopInfo.idComputadora, fecha: fecha }
+    $.post(apiURL + '/desktopRecord', data, function(data) {
+        console.log(data);
+    })
+}

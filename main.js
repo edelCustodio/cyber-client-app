@@ -30,24 +30,23 @@ var Main = {
 
     var fileExist = false;
     //comprobar si existe el archivo user-preferences.json
-    if(fileConfigExist()) {
-      fileName = 'index.html'
-      //var store = new Store();
-      width = 247;
-      height = 60;
-      fileExist = true;
-    }
+    // if(fileConfigExist()) {
+    //   fileName = 'index.html';
+    //   width = 247;
+    //   height = 60;
+    //   fileExist = true;
+    // }
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
       width: width, 
       height: height,
-       transparent: true,
-       frame: false,
-       toolbar: false,
-       skipTaskbar: true,
-       alwaysOnTop: true,
-       resizable: false
+      //  transparent: true,
+      //  frame: false,
+      //  toolbar: false,
+      //  skipTaskbar: true,
+      //  alwaysOnTop: true,
+      //  resizable: false
     })
 
     // if(fileExist)

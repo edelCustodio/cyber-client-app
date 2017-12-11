@@ -39,7 +39,32 @@ var Computadora = {
         SQLHelper.addSqlParameter(SQLHelper.sqlParameter('ipCliente', localAddress, TYPES.VarChar));
         SQLHelper.addSqlParameter(SQLHelper.sqlParameter('nombreCliente', os.hostname(), TYPES.VarChar));
         return SQLHelper.executeStatement(query, true);
-    }
+    },
+
+    getDesktopByName: function () {
+        SQLHelper.createConnection();
+        var query = 'SELECT * FROM Catalogo.Computadora WHERE nombre = @nombre'
+        SQLHelper.clearSqlParameters();
+        SQLHelper.addSqlParameter(SQLHelper.sqlParameter('nombre', os.hostname(), TYPES.VarChar));
+        return SQLHelper.executeStatement(query, false);
+    },
+
+    getDesktopByIPAddress: function (IPAddress) {
+        SQLHelper.createConnection();
+        var query = 'SELECT * FROM Catalogo.Computadora WHERE [IP] = @ipAddress'
+        SQLHelper.clearSqlParameters();
+        SQLHelper.addSqlParameter(SQLHelper.sqlParameter('ipAddress', IPAddress, TYPES.VarChar));
+        return SQLHelper.executeStatement(query, false);
+    },
+
+    updateDesktopRecord: function (idComputadora, fecha) {
+        SQLHelper.createConnection();
+        var query = "cliente.GuardarRegistroComputadora"
+        SQLHelper.clearSqlParameters();
+        SQLHelper.addSqlParameter(SQLHelper.sqlParameter('idComputadora', idComputadora, TYPES.Int));
+        SQLHelper.addSqlParameter(SQLHelper.sqlParameter('fecha', fecha, TYPES.DateTime));
+        return SQLHelper.executeStatement(query, true);  
+    },
 }
 
 module.exports = Computadora
