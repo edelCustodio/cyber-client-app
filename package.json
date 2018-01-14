@@ -1,31 +1,85 @@
 {
+  "main": "app/main.js",
   "name": "cyber-client",
-  "dependencies": {
-    "body-parser": "1.18.2",
-    "bootstrap": "3.3.7",
-    "bootstrap-validator": "0.11.9",
-    "electron": "1.7.9",
-    "express": "4.16.2",
-    "flipclock": "0.7.8",
-    "font-awesome": "4.7.0",
-    "ip": "1.1.5",
-    "jquery": "3.2.1",
-    "jquery-countdown": "2.2.0",
-    "tedious": "2.1.1"
-  },
-  "scripts": {
-    "start": "electron ."
-  },
-  "main": "main.js",
+  "description": "Cliente para el control de computadoras de un ciber cafe.",
   "version": "1.1.1",
   "license": "MIT",
-  "description": "Cliente para el control de computadoras de un ciber cafe.",
-  "author": "Edel Custodio Frias",
+  "scripts": {
+    "start": "electron ./app --enable-logging --remote-debugging-port=6969",
+    "production": "electron .",
+    "lint": "eslint **/*.js",
+    "inspect-main": "electron-inspector",
+    "build": "rollup -c",
+    "pack": "electron-builder --dir",
+    "dev": "NODE_ENV='development' npm run start",
+    "compile": "electron-webpack",
+    "dist": "build --win --x64",
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
+    "postinstall": "electron-builder install-app-deps",
+    "prerelease:osx": "rimraf release/osx && mkdirp release/osx",
+    "release:osx": "copyfiles -f dist/mac/*.{dmg,zip} release/osx && PACKAGE_VERSION=$(cat app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && echo $PACKAGE_VERSION >> ./release/osx/VERSION",
+    "prerelease:win32": "rimraf release/win32 && mkdirp release/win32",
+    "release:win32": "copyfiles -f dist/win-ia32/{RELEASES,*.nupkg,*.exe} release/win32",
+    "prerelease:win64": "rimraf release/win64 && mkdirp release/win64",
+    "release:win64": "copyfiles -f dist/win/{RELEASES,*.nupkg,*.exe} release/win64",
+    "release": "run-p release:*",
+    "deploy": "PACKAGE_VERSION=$(cat app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && aws s3 sync release/ s3://eatodo/updates/$PACKAGE_VERSION/ --acl public-read && aws s3 sync s3://eatodo/updates/$PACKAGE_VERSION/ s3://eatodo/updates/latest/ --delete --acl public-read",
+    "all": "run-s dist release deploy",
+    "reload": "live-reload app --port 35729"
+  },
   "devDependencies": {
-    "electron": "~1.7.9"
+    "electron": "1.7.9",
+    "electron-builder": "19.49.0",
+    "electron-webpack": "1.11.0",
+    "webpack": "3.10.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/edelCustodio/cyber-client-app.git"
+  },
+  "build": {
+    "appId": "com.github.edelCustodio.${name}",
+    "dmg": {
+      "title": "Cyber Skynet",
+      "iconSize": 128,
+      "contents": [
+        {
+          "x": 355,
+          "y": 125,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 155,
+          "y": 125,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "publisherName": "friasoftIt Inc."
+    },
+    "nsis": {
+      "perMachine": true,
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "app": "app",
+      "output": "dist"
+    }
+  },
+  "dependencies": {
+    "electron-updater": "2.17.6"
   }
 }

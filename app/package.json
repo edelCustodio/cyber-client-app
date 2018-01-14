@@ -1,0 +1,26 @@
+{
+  "name": "cyber-client",
+  "main": "main.js",
+  "version": "1.1.1",
+  "license": "MIT",
+  "description": "Cliente para el control de computadoras de un ciber cafe.",
+  "author": "Edel Custodio Frias",
+  "dependencies": {
+    "body-parser": "1.18.2",
+    "bootstrap": "3.3.7",
+    "bootstrap-validator": "0.11.9",
+    "electron-is-dev": "0.3.0",
+    "electron-log": "2.2.12",
+    "electron-updater": "2.17.6",
+    "electron-webpack": "1.11.0",
+    "express": "4.16.2",
+    "flipclock": "0.7.8",
+    "font-awesome": "4.7.0",
+    "ip": "1.1.5",
+    "jquery": "3.2.1",
+    "jquery-countdown": "2.2.0",
+    "rollup": "0.52.3",
+    "tedious": "2.1.1",
+    "webpack": "3.10.0"
+  }
+}
