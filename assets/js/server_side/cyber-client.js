@@ -1,26 +1,23 @@
-const Desktop = require('../models/computadora')
 const os = require('os');
 const net = require('net');
 const ip = require('ip');
 let host = '';
 const port = 6969;
+const Main = require('../../../main')
 
  var CyberClient = {
 
-    createCyberClient: function(win) {
-        mainWindow = win;
+    createCyberClient: function(ipServer) {
+        
         var client = new net.Socket();
-        host = this.getIPServer();
+        host = ipServer;
+        var ipClient = this.getIPClient();
 
         client.connect(port, host, function() {
         
             console.log('CONNECTED TO: ' + host + ':' + port);
-            
-            Desktop.getDesktop(client.localAddress).then(res => {
-                // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-                client.write(JSON.stringify(res));
-            })
-            
+            var json = { hostname: os.hostname(), IP: ipClient };
+            client.write(JSON.stringify(json));
         });
           
         // Add a 'data' event handler for the client socket
@@ -30,9 +27,9 @@ const port = 6969;
             var jsonData = JSON.parse(textData);
 
             if (jsonData.start) {
-                mainWindow.webContents.send('start', textData);
+                Main.getMainWindow().webContents.send('start', textData);
             } else {
-                mainWindow.webContents.send('stop', 0);
+                Main.getMainWindow().webContents.send('stop', 0);
             }
         });
         
@@ -40,10 +37,10 @@ const port = 6969;
         client.on('close', function() {
 
             //Obtener info computadora y actualizar estado computadora
-            Desktop.getDesktopByIPAddress(host).then(result => {
-                var desktop = result[0];
-                Desktop.updateDesktopOnline(desktop.idComutadora, false);
-            });
+            // Desktop.getDesktopByIPAddress(host).then(result => {
+            //     var desktop = result[0];
+            //     Desktop.updateDesktopOnline(desktop.idComutadora, false);
+            // });
             
             console.log('Connection closed');
         });
@@ -55,8 +52,24 @@ const port = 6969;
         });
     },
 
-    getIPServer: function () {
-        return ip.address();//get IP server from config file using fs 
+    getIPClient: function () {
+        var ipAddress = '';
+        
+        try {
+            var ipWifi = ip.address('Wi-Fi');
+            ipAddress = ipWifi;
+        } catch (e) {
+            console.log(e);
+        }
+        
+        try {
+            var ipEthernet = ip.address('Ethernet');
+            ipAddress = ipEthernet;
+        } catch (e) {
+            console.log(e);
+        }
+        
+        return ipAddress;
     }
  }
 

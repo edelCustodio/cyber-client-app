@@ -51,9 +51,6 @@ ipcRenderer.on('stop', (event, arg) => {
     //Save record on database end time
     saveDesktopRecord(currentDate);
 
-    //Stop clock
-    //clock.stop();
-
     //Reset clock
     clock.reset();
 });
@@ -61,7 +58,7 @@ ipcRenderer.on('stop', (event, arg) => {
 
 function saveDesktopRecord(fecha) {
     var data = { idComputadora: desktopInfo.idComputadora, fecha: fecha }
-    $.post(apiURL + '/desktopRecord', data, function(data) {
+    $.post(apiURL + '/api/desktopRecord', data, function(data) {
         console.log(data);
     })
 }

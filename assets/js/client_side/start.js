@@ -1,5 +1,8 @@
 
 let apiURL = "http://localhost:7070";
+var ipcRenderer = require('electron').ipcRenderer;
+var pathConfigFile = '';
+var hostname = '';
 
 /**
  * Document Ready
@@ -8,25 +11,17 @@ $(document).ready(function () {
     //getFileConfig();
 })
 
-function getFileConfig(ipAddress) {
+ipcRenderer.on('replyIPServer', (event, arg) => {
+    location.href = 'index.html';
+});
 
-    $.post(apiURL + '/fileExists', {ipAddress: ipAddress}, function(data){
-        if (data.result) {
-            sessionStorage.setItem('desktop', JSON.stringify(data.data));
-            document.location.href = "index.html";
-        }
-    })
-   
-}
 
 $('#frIPAddress').validator().on('submit', function (e) {
     
-    if (e.isDefaultPrevented()) {
-        // handle the invalid form...
-    } else {
+    if (!e.isDefaultPrevented()) {
         // everything looks good!
         var ipServer = $("#ipServer").val();
-        getFileConfig(ipServer);
+        ipcRenderer.send('sendIPServer', ipServer)
     }
 
     e.preventDefault();
