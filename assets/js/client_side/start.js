@@ -12,6 +12,7 @@ $(document).ready(function () {
 })
 
 ipcRenderer.on('replyIPServer', (event, arg) => {
+    sessionStorage.setItem('hostnameInfo', arg);
     location.href = 'index.html';
 });
 
@@ -21,7 +22,8 @@ $('#frIPAddress').validator().on('submit', function (e) {
     if (!e.isDefaultPrevented()) {
         // everything looks good!
         var ipServer = $("#ipServer").val();
-        ipcRenderer.send('sendIPServer', ipServer)
+        ipcRenderer.send('sendIPServer', ipServer);
+        sessionStorage.setItem('IPServer', ipServer);
     }
 
     e.preventDefault();

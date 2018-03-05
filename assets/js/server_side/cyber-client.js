@@ -3,13 +3,13 @@ const net = require('net');
 const ip = require('ip');
 let host = '';
 const port = 6969;
-const Main = require('../../../main')
+const Main = require('../../../main');
+const { ipcMain } = require('electron');
+const client = new net.Socket();
 
  var CyberClient = {
 
     createCyberClient: function(ipServer) {
-        
-        var client = new net.Socket();
         host = ipServer;
         var ipClient = this.getIPClient();
 
@@ -35,13 +35,8 @@ const Main = require('../../../main')
         
         // Add a 'close' event handler for the client socket
         client.on('close', function() {
-
             //Obtener info computadora y actualizar estado computadora
-            // Desktop.getDesktopByIPAddress(host).then(result => {
-            //     var desktop = result[0];
-            //     Desktop.updateDesktopOnline(desktop.idComutadora, false);
-            // });
-            
+            Main.getMainWindow().webContents.send('close', true);            
             console.log('Connection closed');
         });
         
@@ -59,18 +54,26 @@ const Main = require('../../../main')
             var ipWifi = ip.address('Wi-Fi');
             ipAddress = ipWifi;
         } catch (e) {
-            console.log(e);
+            // console.log(e);
         }
         
         try {
             var ipEthernet = ip.address('Ethernet');
             ipAddress = ipEthernet;
         } catch (e) {
-            console.log(e);
+            // console.log(e);
         }
         
         return ipAddress;
     }
  }
+
+ipcMain.on('time-off', (event, arg) => {  
+    client.write(JSON.stringify({ stopBy: 'time-off', client: os.hostname() }));
+});
+
+ipcMain.on('record', (event, arg) => {  
+    client.write(arg);
+});
 
  module.exports = CyberClient;

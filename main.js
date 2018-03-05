@@ -4,7 +4,7 @@ const url = require('url');
 const fs = require('fs');
 const os = require('os');
 const { ipcMain } = require('electron')
-const CyberClient = require('./assets/js/server_side/cyber-client');
+
 let Store = require('./assets/js/server_side/file-helper')
 
 const { autoUpdater } = require('electron-updater')
@@ -60,9 +60,9 @@ var Main = {
     var fileName = 'start.html';
     var width = 800;
     var height = 600;
-    //console.log(fileConfigExist())
+
     //comprobar si existe el archivo user-preferences.json
-    if(store.exists()) {
+    /*if(store.exists()) {
       fileName = 'index.html';
       var windowBounds = store.get('windowBounds');
       width = windowBounds.width;
@@ -71,18 +71,18 @@ var Main = {
       CyberClient.createCyberClient(store.get('IPServer'));
     } else {
       store.set('hostname', os.hostname());
-    }
+    }*/
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
       width: width, 
       height: height,
-      transparent: true,
-      frame: false,
-      toolbar: false,
-      skipTaskbar: true,
-       alwaysOnTop: true,
-       resizable: false
+      // transparent: true,
+      // frame: false,
+      // toolbar: false,
+      // skipTaskbar: true,
+      // alwaysOnTop: true,
+      // resizable: false
     })
     
     // and load the index.html of the app.
@@ -202,8 +202,12 @@ ipcMain.on('sendIPServer', (event, arg) => {
 
   store.set('IPServer', ipServer);
 
+  mainWindow.setSize(247, 60);
   event.sender.send('replyIPServer', JSON.stringify(jsonClientConfig));
-})
+});
+
+
 
 
 module.exports = Main;
+const CyberClient = require('./assets/js/server_side/cyber-client');

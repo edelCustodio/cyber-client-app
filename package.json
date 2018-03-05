@@ -8,6 +8,15 @@
   "scripts": {
     "start": "electron . --enable-logging --remote-debugging-port=6969"
   },
+  "build": {
+    "appId": "com.friasoftit.skynet-client",
+    "productName": "Skynet Client",
+    "publish": [{
+      "provider": "github",
+      "owner": "edelCustodio",
+      "repo": "cyber-client-app"
+    }]
+  },
   "dependencies": {
     "body-parser": "1.18.2",
     "bootstrap": "3.3.7",
