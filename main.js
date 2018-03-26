@@ -62,7 +62,7 @@ var Main = {
     var height = 600;
 
     //comprobar si existe el archivo user-preferences.json
-    /*if(store.exists()) {
+    if(store.exists()) {
       fileName = 'index.html';
       var windowBounds = store.get('windowBounds');
       width = windowBounds.width;
@@ -71,18 +71,18 @@ var Main = {
       CyberClient.createCyberClient(store.get('IPServer'));
     } else {
       store.set('hostname', os.hostname());
-    }*/
+    }
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
       width: width, 
       height: height,
-      // transparent: true,
-      // frame: false,
-      // toolbar: false,
-      // skipTaskbar: true,
-      // alwaysOnTop: true,
-      // resizable: false
+      transparent: true,
+      frame: false,
+      toolbar: false,
+      skipTaskbar: true,
+      alwaysOnTop: true,
+      resizable: false
     })
     
     // and load the index.html of the app.
