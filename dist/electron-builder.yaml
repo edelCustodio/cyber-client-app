@@ -1,4 +1,10 @@
 directories:
   output: dist
   buildResources: build
+appId: com.friasoftit.skynet-client
+productName: Skynet Client
+publish:
+  - provider: github
+    owner: edelCustodio
+    repo: cyber-client-app
 electronVersion: 1.7.9

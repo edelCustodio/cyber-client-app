@@ -36,7 +36,9 @@ const client = new net.Socket();
         // Add a 'close' event handler for the client socket
         client.on('close', function() {
             //Obtener info computadora y actualizar estado computadora
-            Main.getMainWindow().webContents.send('close', true);            
+            Main.getMainWindow().webContents.send('close', true);
+            
+            client.write(JSON.stringify({ closeApp: true, hostname: os.hostname() }));
             console.log('Connection closed');
         });
         

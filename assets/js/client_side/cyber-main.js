@@ -1,8 +1,11 @@
 
 
 window.$ = window.jQuery = require('jquery');
+var electron = require('electron');  
+var { app, BrowserWindow, ipcMain } = electron; 
 var FlipClock = require('./assets/js/flipclock.js');
 var bootstrap = require('bootstrap');
+const os = require('os');
 var { ipcRenderer, remote } = require('electron');  
 var desktopInfo = {}
 var hostnameInfo = {}
@@ -10,13 +13,26 @@ let apiURL = ''; //http://localhost:7070
 let ipServer = '';
 
 var clock = {};
+ipcRenderer.send('goForIPServer', 1);
 
 $(document).ready(function () {
-    ipServer = sessionStorage.getItem('IPServer');
-    apiURL = 'http://' + ipServer + ':7070/';
+
+    // Reply on async message from renderer process
+
+
     
-    hostnameInfo = JSON.parse(sessionStorage.getItem('hostnameInfo'));
-    desktopInfo = JSON.parse(sessionStorage.getItem('desktopInfo'));
+});
+
+/**
+ * Listen for async message from renderer process
+ */
+ipcRenderer.on('getForIPServer', (event, arg) => {  
+        
+    sessionStorage.setItem('IPServer', arg);
+    apiURL = 'http://' + arg + ':7070/';
+    
+    // hostnameInfo = JSON.parse(sessionStorage.getItem('hostnameInfo'));
+    // desktopInfo = JSON.parse(sessionStorage.getItem('desktopInfo'));
 
     //move the clock lower-down right corner
     window.moveTo(screen.width, screen.height + 20);
@@ -27,7 +43,6 @@ $(document).ready(function () {
     });
     clock.stop();
 });
-
 //Start clock depending of values
 function initializeClock(params) {
     var currentDate = new Date();
@@ -108,7 +123,7 @@ function setDesktopOnline(status) {
 }
 
 function getDesktopInfo() {
-    $.get(apiURL + 'api/getDesktop', { localAddress: ipServer, hostname: hostnameInfo.hostname }, function(data) {
+    $.get(apiURL + 'api/getDesktop', { localAddress: ipServer, hostname: os.hostname() }, function(data) {
         desktopInfo = data[0];
         sessionStorage.setItem('desktopInfo', JSON.stringify(desktopInfo));
         setDesktopOnline(true);

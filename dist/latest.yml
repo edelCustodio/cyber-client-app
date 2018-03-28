@@ -1,9 +1,9 @@
 version: 1.1.1
 files:
   - url: cyber-client-setup-1.1.1.exe
-    sha512: h0yAXo4ZI3Uzwoa+x0+5CtnU/oMJqA0gIVNOlAFQRbei8Hm35jo5VbQOeLIDBfrZwpbq96Wxpwr8/Q7NUHKWOQ==
-    size: 42237766
+    sha512: Z0d0kmQqJwslLyd1dUJGMb3/8ncvpFc738fHTt8Qj+ZrqTCOqEttWDG0HOULTqHKXbKFhX1LrpZ8IFStuwNcmQ==
+    size: 42296364
 path: cyber-client-setup-1.1.1.exe
-sha512: h0yAXo4ZI3Uzwoa+x0+5CtnU/oMJqA0gIVNOlAFQRbei8Hm35jo5VbQOeLIDBfrZwpbq96Wxpwr8/Q7NUHKWOQ==
-sha2: 6e3391cc0499ed3fcdaac5520b88e21021167d833537a0b01354c6ca4f5e8dca
-releaseDate: '2018-01-23T01:55:44.132Z'
+sha512: Z0d0kmQqJwslLyd1dUJGMb3/8ncvpFc738fHTt8Qj+ZrqTCOqEttWDG0HOULTqHKXbKFhX1LrpZ8IFStuwNcmQ==
+sha2: 84dba776e47b2ee836ee7ff47a5cabc627eb4ab6a18f3a12a7cea77d346b86f0
+releaseDate: '2018-03-28T04:41:58.650Z'

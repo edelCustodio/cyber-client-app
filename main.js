@@ -3,9 +3,9 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 const os = require('os');
-const { ipcMain } = require('electron')
+const { ipcMain, ipcRenderer } = require('electron')
 
-let Store = require('./assets/js/server_side/file-helper')
+const configuration = require('./assets/js/server_side/file-helper')
 
 const { autoUpdater } = require('electron-updater')
 const isDev = require('electron-is-dev')
@@ -31,18 +31,18 @@ const Tray = electron.Tray
 let appIcon = null
 
 // First instantiate the class
-const store = new Store({
-  // We'll call our data file 'user-preferences'
-  configName: 'user-preferences',
-  defaults: {
-      // 800x600 is the default size of our window
-      windowBounds: { 
-          width: 247, 
-          height: 60
-      },
-      IPServer: ''
-  }
-});
+// const store = new Store({
+//   // We'll call our data file 'user-preferences'
+//   configName: 'user-preferences',
+//   defaults: {
+//       // 800x600 is the default size of our window
+//       windowBounds: { 
+//           width: 247, 
+//           height: 60
+//       },
+//       IPServer: ''
+//   }
+// });
 
 function sendStatusToWindow(text) {
   log.info(text);
@@ -62,23 +62,24 @@ var Main = {
     var height = 600;
 
     //comprobar si existe el archivo user-preferences.json
-    if(store.exists()) {
+    if(configuration.existFileConfig()) {
       fileName = 'index.html';
-      var windowBounds = store.get('windowBounds');
+      var windowBounds = configuration.readSettings('windowBounds');
       width = windowBounds.width;
       height = windowBounds.height;
 
-      CyberClient.createCyberClient(store.get('IPServer'));
+      CyberClient.createCyberClient(configuration.readSettings('IPServer'));
     } else {
-      store.set('hostname', os.hostname());
+      // create settings
+     
     }
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
       width: width, 
       height: height,
-      transparent: true,
-      frame: false,
+      // transparent: true,
+      // frame: false,
       toolbar: false,
       skipTaskbar: true,
       alwaysOnTop: true,
@@ -92,8 +93,8 @@ var Main = {
       slashes: true
     }))
 
-    //API
-    //let server = require('./assets/js/server_side/api')
+    // Open the DevTools.
+    // mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -117,6 +118,7 @@ var Main = {
     
     appIcon.setToolTip('Skynet client.')
     //appIcon.setContextMenu(contextMenu)
+    
   },
 
   getMainWindow: function () {
@@ -130,18 +132,10 @@ var Main = {
   
 }
 
-function pathConfigFile() {
-  const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-  
-  const pathFile = path.join(userDataPath, 'user-preferences.json');
 
-  return pathFile;
-}
-
-function fileConfigExist() {  
-  return fs.existsSync(pathConfigFile());
-}
-
+/**
+ * Update app
+ */
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
 })
@@ -196,15 +190,29 @@ autoUpdater.on('checking-for-update', () => {
 ipcMain.on('sendIPServer', (event, arg) => {
   var ipServer = arg;
   
-  var jsonClientConfig = { hostname: os.hostname(), pathConfigFile: pathConfigFile() }
+  var jsonClientConfig = { hostname: os.hostname(), pathConfigFile: configuration.getFileConfig() }
+
   //comunicate client socket to the server
   CyberClient.createCyberClient(ipServer);
 
-  store.set('IPServer', ipServer);
+  if (!configuration.existFileConfig()) {
+    configuration.saveSettings('windowBounds', { 'width': 247, 'height': 60 });
+    configuration.saveSettings('hostname', os.hostname());
+    configuration.saveSettings('IPServer', ipServer);
+  }
 
   mainWindow.setSize(247, 60);
   event.sender.send('replyIPServer', JSON.stringify(jsonClientConfig));
 });
+
+// Listen for async-reply message from main process
+ipcMain.on('goForIPServer', (event, arg) => {  
+  // Print 2
+  console.log(arg);
+  // Send sync message to main process
+  event.sender.send('getForIPServer', configuration.readSettings('IPServer'));
+});
+
 
 
 

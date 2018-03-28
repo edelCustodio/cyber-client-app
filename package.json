@@ -11,11 +11,13 @@
   "build": {
     "appId": "com.friasoftit.skynet-client",
     "productName": "Skynet Client",
-    "publish": [{
-      "provider": "github",
-      "owner": "edelCustodio",
-      "repo": "cyber-client-app"
-    }]
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "edelCustodio",
+        "repo": "cyber-client-app"
+      }
+    ]
   },
   "dependencies": {
     "body-parser": "1.18.2",
@@ -30,6 +32,7 @@
     "ip": "1.1.5",
     "jquery": "3.2.1",
     "jquery-countdown": "2.2.0",
+    "nconf": "0.10.0",
     "rollup": "0.52.3",
     "webpack": "3.10.0"
   },
