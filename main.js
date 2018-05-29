@@ -63,12 +63,12 @@ var Main = {
     mainWindow = new BrowserWindow({
       width: width, 
       height: height,
-      // transparent: true,
-      // frame: false,
-      // toolbar: false,
-      // skipTaskbar: true,
-      // alwaysOnTop: true,
-      // resizable: false
+      transparent: true,
+      frame: false,
+      toolbar: false,
+      skipTaskbar: true,
+      alwaysOnTop: true,
+      resizable: false
     })
     
     // and load the index.html of the app.
@@ -79,7 +79,7 @@ var Main = {
     }))
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
