@@ -6,7 +6,8 @@
   "description": "Cliente para el control de computadoras de un ciber cafe.",
   "author": "Edel Custodio Frias",
   "scripts": {
-    "start": "electron . --enable-logging --remote-debugging-port=6969"
+    "start": "electron . --enable-logging --remote-debugging-port=6969",
+    "publish": "node_modules/.bin/build --win -p always"
   },
   "build": {
     "appId": "com.friasoftit.skynet-client",
@@ -20,6 +21,7 @@
     ]
   },
   "dependencies": {
+    "auto-launch": "5.0.5",
     "body-parser": "1.18.2",
     "bootstrap": "3.3.7",
     "bootstrap-validator": "0.11.9",
@@ -32,7 +34,9 @@
     "ip": "1.1.5",
     "jquery": "3.2.1",
     "jquery-countdown": "2.2.0",
+    "lock-your-windows": "0.0.0",
     "nconf": "0.10.0",
+    "request": "2.81.0",
     "rollup": "0.52.3",
     "webpack": "3.10.0"
   },

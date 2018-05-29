@@ -12,24 +12,21 @@ var hostnameInfo = {}
 let apiURL = ''; //http://localhost:7070
 let ipServer = '';
 
+
 var clock = {};
 ipcRenderer.send('goForIPServer', 1);
 
 $(document).ready(function () {
-
     // Reply on async message from renderer process
-
-
-    
 });
 
 /**
  * Listen for async message from renderer process
  */
 ipcRenderer.on('getForIPServer', (event, arg) => {  
-        
-    sessionStorage.setItem('IPServer', arg);
-    apiURL = 'http://' + arg + ':7070/';
+    var ips = JSON.parse(arg);
+    sessionStorage.setItem('IPServer', ips.ipServer);
+    apiURL = 'http://' + ips.ipServer + ':7070/';
     
     // hostnameInfo = JSON.parse(sessionStorage.getItem('hostnameInfo'));
     // desktopInfo = JSON.parse(sessionStorage.getItem('desktopInfo'));
@@ -69,12 +66,27 @@ function initializeClock(params) {
     }
 
     //Save record on database start time
-    saveDesktopRecord(currentDate);
+    saveDesktopRecord(currentDate, params.minutes);
 }
 
 ipcRenderer.on('start', (event, arg) => {
     var params = JSON.parse(arg);
     initializeClock(params);
+});
+
+/**
+ * Se ejecuta cuando la aplicacion esta cerrandose, en ese caso, necesitamos cambiar el estado
+ * de la maquina cliente para que no sea vista mas por la aplicacion principal
+ */
+ipcRenderer.on('appClosed', (event, arg) => {
+    var desktop = JSON.parse(sessionStorage.getItem('desktopInfo'));
+    var data = { idComputadora: desktop.idComputadora, enLinea: false };
+    $.post(apiURL + '/api/setDesktopOnline', data, function(data) {
+        if(data.result)
+            desktopInfo = data.data;
+        else
+            console.log(data);
+    });
 });
 
 // Message from main process to stop to clock
@@ -97,19 +109,23 @@ function stopClock(timeOff) {
         ipcRenderer.send('time-off', timeOff);
     else {
         clock.stop();
-        clock.reset();
+        clock.setTime(0);
     }
 }
 
-function saveDesktopRecord(fecha) {
-    var data = { idComputadora: desktopInfo.idComputadora, fecha: fecha }
+/**
+ * Guardar el registro de uso de la computadora
+ * @param {*} fecha fecha, puede ser fechaInicio o fechaFin
+ * @param {*} minutos total de minutos de uso de la computadora
+ */
+function saveDesktopRecord(fecha, minutos = 0) {
+    var data = { idComputadora: desktopInfo.idComputadora, fecha: fecha, minutos: minutos }
     $.post(apiURL + 'api/desktopRecord', data, function(result) {
         if (result.length > 0) {
             console.log(result);
             ipcRenderer.send('record', JSON.stringify(result[0]));
         }
-        
-    })
+    });
 }
 
 function setDesktopOnline(status) {
@@ -127,6 +143,7 @@ function getDesktopInfo() {
         desktopInfo = data[0];
         sessionStorage.setItem('desktopInfo', JSON.stringify(desktopInfo));
         setDesktopOnline(true);
+        ipcRenderer.send('saveDesktopInfo', JSON.stringify(desktopInfo));
     })
 }
 

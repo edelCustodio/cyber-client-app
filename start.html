@@ -27,7 +27,9 @@
 
             <div class="lb-body">
                 <form id="frIPAddress" data-toggle="validator">
-                    <p class="m-b-30">Por favor, ingresa la IP del servidor al cual se conectará esta aplicación.</p>
+                    <p class="m-b-30">Por favor, ingresa la IP del servidor al cual se conectará esta aplicación,
+                        y la IP de la maquina que la controlará.
+                    </p>
 
                     <div class="form-group fg-float">
                         <div class="fg-line">
@@ -35,6 +37,24 @@
                             data-error="Dirección IP no valida."
                             pattern="^(([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$">
                             <label class="fg-label">IP del servidor</label>
+                        </div>
+                        <small class="help-block with-errors"></small>
+                    </div>
+                    <div class="form-group fg-float">
+                        <div class="fg-line">
+                            <input id="ipMachine" type="text" required class="input-sm form-control fg-input"
+                            data-error="Dirección IP no valida."
+                            pattern="^(([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$">
+                            <label class="fg-label">IP de la maquina de cobro</label>
+                        </div>
+                        <small class="help-block with-errors"></small>
+                    </div>
+                    <div class="form-group fg-float">
+                        <div class="fg-line">
+                            <input id="ipClient" type="text" required class="input-sm form-control fg-input"
+                            data-error="Dirección IP no valida."
+                            pattern="^(([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$">
+                            <label class="fg-label">IP maquina cliente</label>
                         </div>
                         <small class="help-block with-errors"></small>
                     </div>

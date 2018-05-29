@@ -4,7 +4,9 @@ const url = require('url');
 const fs = require('fs');
 const os = require('os');
 const { ipcMain, ipcRenderer } = require('electron')
-
+// const clientSocket = require('./assets/js/server_side/cyber-client');
+const AutoLaunch = require('auto-launch');
+const request = require('request');
 const configuration = require('./assets/js/server_side/file-helper')
 
 const { autoUpdater } = require('electron-updater')
@@ -30,20 +32,6 @@ const Tray = electron.Tray
 
 let appIcon = null
 
-// First instantiate the class
-// const store = new Store({
-//   // We'll call our data file 'user-preferences'
-//   configName: 'user-preferences',
-//   defaults: {
-//       // 800x600 is the default size of our window
-//       windowBounds: { 
-//           width: 247, 
-//           height: 60
-//       },
-//       IPServer: ''
-//   }
-// });
-
 function sendStatusToWindow(text) {
   log.info(text);
   Main.getMainWindow().webContents.send('message', text);
@@ -68,10 +56,7 @@ var Main = {
       width = windowBounds.width;
       height = windowBounds.height;
 
-      CyberClient.createCyberClient(configuration.readSettings('IPServer'));
-    } else {
-      // create settings
-     
+      CyberClient.createCyberClient(configuration.readSettings('IPMachine'), configuration.readSettings('IPClient'));
     }
 
     // Create the browser window.
@@ -80,10 +65,10 @@ var Main = {
       height: height,
       // transparent: true,
       // frame: false,
-      toolbar: false,
-      skipTaskbar: true,
-      alwaysOnTop: true,
-      resizable: false
+      // toolbar: false,
+      // skipTaskbar: true,
+      // alwaysOnTop: true,
+      // resizable: false
     })
     
     // and load the index.html of the app.
@@ -94,14 +79,24 @@ var Main = {
     }))
 
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
+
+      const ipServer = configuration.readSettings('IPServer');
+      var desktop = configuration.readSettings('desktopInfo');
+      var data = { idComputadora: desktop.idComputadora, enLinea: false };
+
+      // Quitar de linea la maquina cliente
+      request.post('http://' + ipServer + ':7070/api/setDesktopOnline', { form: data }, (err, res, body) => {
+        if (err) { return console.log(err); }
+        console.log(body.url);
+        console.log(body.explanation);
+      });
+
+      // eliminar ventana
+      mainWindow = null;
     });
 
     //Try icon
@@ -116,6 +111,19 @@ var Main = {
     // }
     // }])
     
+
+    // Ejecutar la aplicacion cada vez que el SO inicie
+    let autoLaunch = new AutoLaunch({
+      name: 'cyber-client',
+      path: app.getPath('exe'),
+    });
+
+    autoLaunch.isEnabled().then((isEnabled) => {
+      if (!isEnabled) {
+        autoLaunch.enable();
+      }
+    });
+
     appIcon.setToolTip('Skynet client.')
     //appIcon.setContextMenu(contextMenu)
     
@@ -127,9 +135,7 @@ var Main = {
 
   getApp: function () {
     return app;
-  },
-
-  
+  },  
 }
 
 
@@ -188,17 +194,19 @@ autoUpdater.on('checking-for-update', () => {
  * Message communication
  */
 ipcMain.on('sendIPServer', (event, arg) => {
-  var ipServer = arg;
+  var ips = JSON.parse(arg);
   
   var jsonClientConfig = { hostname: os.hostname(), pathConfigFile: configuration.getFileConfig() }
 
-  //comunicate client socket to the server
-  CyberClient.createCyberClient(ipServer);
+  //comunicate client socket to the machine which will 
+  CyberClient.createCyberClient(ips.ipMachine, ips.ipClient);
 
   if (!configuration.existFileConfig()) {
     configuration.saveSettings('windowBounds', { 'width': 247, 'height': 60 });
     configuration.saveSettings('hostname', os.hostname());
-    configuration.saveSettings('IPServer', ipServer);
+    configuration.saveSettings('IPServer', ips.ipServer);
+    configuration.saveSettings('IPMachine', ips.ipMachine);
+    configuration.saveSettings('IPClient', ips.ipClient);
   }
 
   mainWindow.setSize(247, 60);
@@ -209,11 +217,18 @@ ipcMain.on('sendIPServer', (event, arg) => {
 ipcMain.on('goForIPServer', (event, arg) => {  
   // Print 2
   console.log(arg);
+  var ips = { ipServer: configuration.readSettings('IPServer'), ipMachine: configuration.readSettings('IPMachine') };
   // Send sync message to main process
-  event.sender.send('getForIPServer', configuration.readSettings('IPServer'));
+  event.sender.send('getForIPServer', JSON.stringify(ips));
 });
 
-
+/**
+ * Guardar info de la maquina cliente en el archivo
+ * de configuraciones
+ */
+ipcMain.on('saveDesktopInfo', (event, arg) => {  
+  configuration.saveSettings('desktopInfo', JSON.parse(arg));
+});
 
 
 

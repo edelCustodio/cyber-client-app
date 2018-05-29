@@ -1,5 +1,4 @@
 
-let apiURL = "http://localhost:7070";
 var ipcRenderer = require('electron').ipcRenderer;
 var pathConfigFile = '';
 var hostname = '';
@@ -22,7 +21,10 @@ $('#frIPAddress').validator().on('submit', function (e) {
     if (!e.isDefaultPrevented()) {
         // everything looks good!
         var ipServer = $("#ipServer").val();
-        ipcRenderer.send('sendIPServer', ipServer);
+        var ipMachine = $("#ipMachine").val();
+        var ipClient = $("#ipClient").val();
+        var ips = { ipServer: ipServer, ipMachine: ipMachine, ipClient: ipClient };
+        ipcRenderer.send('sendIPServer', JSON.stringify(ips));
         sessionStorage.setItem('IPServer', ipServer);
     }
 

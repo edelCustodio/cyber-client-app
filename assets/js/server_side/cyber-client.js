@@ -6,18 +6,27 @@ const port = 6969;
 const Main = require('../../../main');
 const { ipcMain } = require('electron');
 const client = new net.Socket();
+var parentActive = false;
+var intervalConnect = false;
+const configuration = require('./file-helper');
+let _ipServer = '';
+let _ipClient = '';
 
  var CyberClient = {
 
-    createCyberClient: function(ipServer) {
-        host = ipServer;
-        var ipClient = this.getIPClient();
+    createCyberClient: function(ipMachine, ipClient) {
+        host = ipMachine;
+        _ipServer = configuration.readSettings('IPMachine');
+        _ipClient = configuration.readSettings('IPClient');
+        const $this = this;
+        parentActive = false;
 
         client.connect(port, host, function() {
-        
+            // $this.clearIntervalConnect();
             console.log('CONNECTED TO: ' + host + ':' + port);
             var json = { hostname: os.hostname(), IP: ipClient };
             client.write(JSON.stringify(json));
+            parentActive = true;
         });
           
         // Add a 'data' event handler for the client socket
@@ -35,18 +44,32 @@ const client = new net.Socket();
         
         // Add a 'close' event handler for the client socket
         client.on('close', function() {
-            //Obtener info computadora y actualizar estado computadora
-            Main.getMainWindow().webContents.send('close', true);
+            parentActive = false;
+            //Obtener info computadora y actualizar estado computadora            
+            // client.write(JSON.stringify({ closeApp: true, hostname: os.hostname() }));
             
-            client.write(JSON.stringify({ closeApp: true, hostname: os.hostname() }));
+            // $this.launchIntervalConnect();
             console.log('Connection closed');
         });
         
       
         client.on('error', function(data){
-          console.error(data.stack);
-          console.log("Node NOT Exiting...");
+            // $this.launchIntervalConnect();
+            console.error(data.stack);
+            console.log("Node NOT Exiting...");
+            parentActive = false;
         });
+    },
+
+    launchIntervalConnect() {
+        if(false != intervalConnect) return
+        intervalConnect = setInterval(reconnect.bind(), 5000)
+    },
+
+    clearIntervalConnect() {
+        if(false == intervalConnect) return
+        clearInterval(intervalConnect)
+        intervalConnect = false;
     },
 
     getIPClient: function () {
@@ -60,14 +83,41 @@ const client = new net.Socket();
         }
         
         try {
-            var ipEthernet = ip.address('Ethernet');
-            ipAddress = ipEthernet;
+            if(ipAddress === '') {
+                var ipEthernet = ip.address('Ethernet');
+                ipAddress = ipEthernet;
+            }
         } catch (e) {
             // console.log(e);
         }
+
+        if(ipAddress === '') {
+            const ifaces = os.networkInterfaces();
+            Object.keys(ifaces).forEach(ifname => {
+                if(ifname.toLowerCase().indexOf('ethernet') >= 0) {
+                    const eth = ifaces[ifname];
+                    eth.forEach(ipObj => {
+                        if(ipObj.family === 'IPv4') {
+                            ipAddress = ipObj.address;
+                        }
+                    });
+                }
+            });
+        }
         
         return ipAddress;
+    },
+
+    getClientSocket: function() {
+        return client;
     }
+ }
+
+ /**
+  * Reconectar socket
+  */
+ function reconnect() {
+    CyberClient.createCyberClient(_ipServer, _ipClient);
  }
 
 ipcMain.on('time-off', (event, arg) => {  
