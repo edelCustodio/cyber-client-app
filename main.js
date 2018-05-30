@@ -83,18 +83,6 @@ var Main = {
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
-
-      const ipServer = configuration.readSettings('IPServer');
-      var desktop = configuration.readSettings('desktopInfo');
-      var data = { idComputadora: desktop.idComputadora, enLinea: false };
-
-      // Quitar de linea la maquina cliente
-      request.post('http://' + ipServer + ':7070/api/setDesktopOnline', { form: data }, (err, res, body) => {
-        if (err) { return console.log(err); }
-        console.log(body.url);
-        console.log(body.explanation);
-      });
-
       // eliminar ventana
       mainWindow = null;
     });
@@ -124,7 +112,7 @@ var Main = {
       }
     });
 
-    appIcon.setToolTip('Skynet client.')
+    appIcon.setToolTip('Skynet client')
     //appIcon.setContextMenu(contextMenu)
     
   },
