@@ -32,12 +32,6 @@ const Tray = electron.Tray
 
 let appIcon = null
 
-function sendStatusToWindow(text) {
-  log.info(text);
-  Main.getMainWindow().webContents.send('message', text);
-}
-
-
 var Main = {
 
   createWindow: function () {
@@ -130,6 +124,14 @@ var Main = {
 /**
  * Update app
  */
+
+function sendStatusToWindow(text) {
+  log.info(text);
+  mainWindow.webContents.send('message', text);
+  let title = mainWindow.getTitle();
+  mainWindow.setTitle(title + ": " + text);
+}
+
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
 })

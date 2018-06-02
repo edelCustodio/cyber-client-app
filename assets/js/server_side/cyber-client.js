@@ -5,7 +5,7 @@ let host = '';
 const port = 6969;
 const Main = require('../../../main');
 const { ipcMain } = require('electron');
-const client = new net.Socket();
+let client = null;
 var parentActive = false;
 var intervalConnect = false;
 const configuration = require('./file-helper');
@@ -15,6 +15,7 @@ let _ipClient = '';
  var CyberClient = {
 
     createCyberClient: function(ipMachine, ipClient) {
+        client = new net.Socket();
         host = ipMachine;
         _ipServer = configuration.readSettings('IPMachine');
         _ipClient = configuration.readSettings('IPClient');
@@ -22,11 +23,15 @@ let _ipClient = '';
         parentActive = false;
 
         client.connect(port, host, function() {
-            // $this.clearIntervalConnect();
-            console.log('CONNECTED TO: ' + host + ':' + port);
-            var json = { hostname: os.hostname(), IP: ipClient };
-            client.write(JSON.stringify(json));
-            parentActive = true;
+            if (!parentActive) {
+                $this.clearIntervalConnect();
+                console.log('CONNECTED TO: ' + host + ':' + port);
+                var json = { hostname: os.hostname(), IP: ipClient };
+                client.write(JSON.stringify(json));
+                parentActive = true;
+            } else {
+                client.destroy();
+            }          
         });
           
         // Add a 'data' event handler for the client socket
@@ -35,10 +40,12 @@ let _ipClient = '';
             var textData = data.toString('utf8');
             var jsonData = JSON.parse(textData);
 
-            if (jsonData.start) {
-                Main.getMainWindow().webContents.send('start', textData);
-            } else {
-                Main.getMainWindow().webContents.send('stop', 0);
+            if (!client.destroyed) {
+                if (jsonData.start) {
+                    Main.getMainWindow().webContents.send('start', textData);
+                } else {
+                    Main.getMainWindow().webContents.send('stop', 0);
+                }
             }
         });
         
@@ -47,14 +54,16 @@ let _ipClient = '';
             parentActive = false;
             //Obtener info computadora y actualizar estado computadora            
             // client.write(JSON.stringify({ closeApp: true, hostname: os.hostname() }));
-            
-            // $this.launchIntervalConnect();
+            // client.end(());
+            client.destroy();
+            $this.launchIntervalConnect();
             console.log('Connection closed');
         });
         
       
-        client.on('error', function(data){
-            // $this.launchIntervalConnect();
+        client.on('error', function(data) {
+            client.destroy();
+            $this.launchIntervalConnect();
             console.error(data.stack);
             console.log("Node NOT Exiting...");
             parentActive = false;
