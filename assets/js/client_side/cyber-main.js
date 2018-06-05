@@ -74,7 +74,7 @@ function initializeClock(params) {
     }
 
     //Save record on database start time
-    saveDesktopRecord(currentDate, params.minutes);
+    saveDesktopRecord(currentDate, params.minutes, params.idUsuario);
 }
 
 ipcRenderer.on('start', (event, arg) => {
@@ -126,8 +126,8 @@ function stopClock(timeOff) {
  * @param {*} fecha fecha, puede ser fechaInicio o fechaFin
  * @param {*} minutos total de minutos de uso de la computadora
  */
-function saveDesktopRecord(fecha, minutos = 0) {
-    var data = { idComputadora: desktopInfo.idComputadora, fecha: fecha, minutos: minutos }
+function saveDesktopRecord(fecha, minutos = 0, idUsuario = 0) {
+    var data = { idComputadora: desktopInfo.idComputadora, fecha: fecha, minutos: minutos, idUsuario: idUsuario }
     $.post(apiURL + 'api/desktopRecord', data, function(result) {
         if (result.length > 0) {
             console.log(result);
@@ -139,8 +139,16 @@ function saveDesktopRecord(fecha, minutos = 0) {
 function setDesktopOnline(status) {
     var data = { idComputadora: desktopInfo.idComputadora, enLinea: status };
     $.post(apiURL + 'api/setDesktopOnline', data, function(data) {
-        if(data.result)
+        if(data.result) {
+
             desktopInfo = data.data;
+                
+            setTimeout(() => {
+                // obtener el ultimo registro de la maquina
+                getLatestDesktopRecord();
+            }, 100);
+        }
+            
         else
             console.log(data);
     })
@@ -152,9 +160,7 @@ function getDesktopInfo() {
         sessionStorage.setItem('desktopInfo', JSON.stringify(desktopInfo));
         setDesktopOnline(true);
         ipcRenderer.send('saveDesktopInfo', JSON.stringify(desktopInfo));
-
-        // obtener el ultimo registro de la maquina
-        getLatestDesktopRecord();
+        
     })
 }
 

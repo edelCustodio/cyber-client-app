@@ -23,15 +23,13 @@ let _ipClient = '';
         parentActive = false;
 
         client.connect(port, host, function() {
-            if (!parentActive) {
-                $this.clearIntervalConnect();
-                console.log('CONNECTED TO: ' + host + ':' + port);
-                var json = { hostname: os.hostname(), IP: ipClient };
-                client.write(JSON.stringify(json));
-                parentActive = true;
-            } else {
-                client.destroy();
-            }          
+            
+            $this.clearIntervalConnect();
+            console.log('CONNECTED TO: ' + host + ':' + port);
+            var json = { hostname: os.hostname(), IP: ipClient };
+            client.write(JSON.stringify(json));
+            parentActive = true;
+                   
         });
           
         // Add a 'data' event handler for the client socket
@@ -40,18 +38,18 @@ let _ipClient = '';
             var textData = data.toString('utf8');
             var jsonData = JSON.parse(textData);
 
-            if (!client.destroyed) {
-                if (jsonData.start) {
-                    Main.getMainWindow().webContents.send('start', textData);
-                } else {
-                    Main.getMainWindow().webContents.send('stop', 0);
-                }
+            
+            if (jsonData.start) {
+                Main.getMainWindow().webContents.send('start', textData);
+            } else {
+                Main.getMainWindow().webContents.send('stop', 0);
             }
+        
         });
         
         // Add a 'close' event handler for the client socket
         client.on('close', function() {
-            parentActive = false;
+            
             //Obtener info computadora y actualizar estado computadora            
             // client.write(JSON.stringify({ closeApp: true, hostname: os.hostname() }));
             // client.end(());
