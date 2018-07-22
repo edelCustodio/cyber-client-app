@@ -41,8 +41,12 @@ let _ipClient = '';
             
             if (jsonData.start) {
                 Main.getMainWindow().webContents.send('start', textData);
-            } else {
+            } else if (jsonData.start !== undefined && !jsonData.start) {
                 Main.getMainWindow().webContents.send('stop', 0);
+            } else if (jsonData.nombre) {
+                Main.getMainWindow().webContents.send('desktopInfo', jsonData);
+            } else if (jsonData.init) {
+                configuration.saveSettings('init', jsonData.record);
             }
         
         });
@@ -53,6 +57,7 @@ let _ipClient = '';
             //Obtener info computadora y actualizar estado computadora            
             // client.write(JSON.stringify({ closeApp: true, hostname: os.hostname() }));
             // client.end(());
+            configuration.saveSettings('init', {});
             client.destroy();
             $this.launchIntervalConnect();
             console.log('Connection closed');
@@ -133,6 +138,15 @@ ipcMain.on('time-off', (event, arg) => {
 
 ipcMain.on('record', (event, arg) => {  
     client.write(arg);
+});
+
+ipcMain.on('requestDesktopInfo', (event, arg) => {  
+    client.write(JSON.stringify({ requestDesktopInfo: true, client: os.hostname() }));
+});
+
+ipcMain.on('init', (event, arg) => {  
+    Main.getMainWindow().webContents.send('init', configuration.readSettings('init'));
+    configuration.saveSettings('init', {});
 });
 
  module.exports = CyberClient;

@@ -16,6 +16,11 @@ function readSettings(settingKey) {
     return nconf.get(settingKey);
 }
 
+function deleteSettings(settingKey) {
+    nconf.load();
+    return nconf.remove(settingKey);
+}
+
 function getUserHome() {
     return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }
@@ -39,6 +44,7 @@ function getFileConfig() {
 module.exports = {
     saveSettings: saveSettings,
     readSettings: readSettings,
+    deleteSettings: deleteSettings,
     existInvoiceFolder: existInvoiceFolder,
     createInvoiceFolder: createInvoiceFolder,
     getUserHome: getUserHome,
