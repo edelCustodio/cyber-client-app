@@ -7,7 +7,9 @@
   "author": "Edel Custodio Frias",
   "scripts": {
     "start": "electron . --enable-logging --remote-debugging-port=6969",
-    "publish": "node_modules/.bin/build --win -p always"
+    "publish": "node_modules/.bin/build --win -p always",
+    "rebuild": "node-gyp configure rebuild --runtime=electron --target=1.7.9 --dist-url=https://atom.io/download/atom-shell --abi=51 --arch=x64",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "com.friasoftit.skynet-client",
@@ -24,8 +26,7 @@
         {
           "target": "nsis",
           "arch": [
-            "x64",
-            "ia32"
+            "x64"
           ]
         }
       ]
@@ -40,6 +41,7 @@
     "electron-log": "2.2.12",
     "electron-updater": "2.18.2",
     "electron-webpack": "1.11.0",
+    "ffi": "2.2.0",
     "flipclock": "0.7.8",
     "font-awesome": "4.7.0",
     "ip": "1.1.5",
@@ -49,11 +51,13 @@
     "moment": "2.22.2",
     "nconf": "0.10.0",
     "request": "2.81.0",
+    "robotjs": "0.5.1",
     "rollup": "0.52.3",
     "webpack": "3.10.0"
   },
   "devDependencies": {
-    "electron": "1.7.9"
+    "electron": "1.7.9",
+    "electron-rebuild": "1.8.2"
   },
   "repository": {
     "type": "git",

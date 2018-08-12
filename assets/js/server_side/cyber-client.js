@@ -11,6 +11,7 @@ var intervalConnect = false;
 const configuration = require('./file-helper');
 let _ipServer = '';
 let _ipClient = '';
+const log = require('electron-log');
 
  var CyberClient = {
 
@@ -22,10 +23,12 @@ let _ipClient = '';
         const $this = this;
         parentActive = false;
 
+        client.setNoDelay(true);
         client.connect(port, host, function() {
             
             $this.clearIntervalConnect();
             console.log('CONNECTED TO: ' + host + ':' + port);
+            var address = client.address();
             var json = { hostname: os.hostname(), IP: ipClient };
             client.write(JSON.stringify(json));
             parentActive = true;
@@ -35,20 +38,45 @@ let _ipClient = '';
         // Add a 'data' event handler for the client socket
         // data is what the server sent to this socket
         client.on('data', function(data) {
-            var textData = data.toString('utf8');
-            var jsonData = JSON.parse(textData);
-
-            
-            if (jsonData.start) {
-                Main.getMainWindow().webContents.send('start', textData);
-            } else if (jsonData.start !== undefined && !jsonData.start) {
-                Main.getMainWindow().webContents.send('stop', 0);
-            } else if (jsonData.nombre) {
-                Main.getMainWindow().webContents.send('desktopInfo', jsonData);
-            } else if (jsonData.init) {
-                configuration.saveSettings('init', jsonData.record);
+            try {
+                var textData = data.toString('utf8');
+                // var jsonData = JSON.parse(textData);
+    
+                var arrJson = [];
+                var countJsonString = (textData.match(/}/g) || []).length;
+                if (countJsonString > 1 && !textData.includes('init')) {
+                    var strJsonSplited = textData.split('}');
+                    strJsonSplited.forEach(s => {
+                        if (s.length > 0) {
+                            arrJson.push(JSON.parse(s + '}'));
+                        }
+                    });
+                } else {
+                    arrJson.push(JSON.parse(textData));
+                }
+    
+                arrJson.forEach(j => {
+                    var jsonData = j;
+                    if (jsonData.start) {
+                        Main.getMainWindow().webContents.send('start', textData);
+                    } else if (jsonData.start !== undefined && !jsonData.start) {
+                        Main.getMainWindow().webContents.send('stop', 0);
+                    } else if (jsonData.nombre) {
+                        Main.getMainWindow().webContents.send('desktopInfo', jsonData);
+                    } else if (jsonData.init) {
+                        configuration.saveSettings('init', jsonData.record);
+                    } else if (jsonData.window) {
+                        if (jsonData.window.lock) {
+                            Main.getMainWindow().webContents.send('lock', 1);
+                        } else if (jsonData.window.unlock) {
+                            Main.getMainWindow().webContents.send('unlock', 1);
+                        }   
+                    }
+                });        
+            } catch (e) {
+                log.info(e);
             }
-        
+            
         });
         
         // Add a 'close' event handler for the client socket

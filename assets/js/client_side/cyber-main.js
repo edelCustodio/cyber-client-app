@@ -14,6 +14,21 @@ let ipServer = '';
 var moment = require('moment');
 var _idUsuario = 0;
 var isCountDown = false;
+var robot = require("robotjs");
+var FFI = require('ffi');
+
+
+// user32.dll
+var user32 = new FFI.Library('user32', {
+    'OpenInputDesktop': [
+       'int32', [ 'int32', 'bool', 'int32' ]
+    ],
+    'SwitchDesktop': [
+        'int32', [ 'int32' ]
+     ],
+     'LockWorkStation': [ "void", [ ] ]
+ });
+
 
 
 var clock = {};
@@ -46,6 +61,25 @@ ipcRenderer.on('getForIPServer', (event, arg) => {
 
 });
 
+ipcRenderer.on('lock', (event, arg) => {  
+    lockScreen();
+});
+
+function lockScreen () {
+    user32.LockWorkStation();
+    setImmediate(() => {
+        unlockScreen();
+    }, 5000);
+}
+
+function unlockScreen () {
+    var screenSize = robot.getScreenSize();
+    robot.moveMouse(screenSize.width / 2, screenSize.height / 2);
+    robot.mouseClick();
+    robot.setKeyboardDelay(100);
+    robot.typeString('3d3l0430111#$%&');
+    robot.keyTap('enter');
+}
 
 /**
  * Inicializar reloj contador para el registro
