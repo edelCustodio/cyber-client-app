@@ -64,7 +64,8 @@ const log = require('electron-log');
                     } else if (jsonData.nombre) {
                         Main.getMainWindow().webContents.send('desktopInfo', jsonData);
                     } else if (jsonData.init) {
-                        configuration.saveSettings('init', jsonData.record);
+                        // configuration.saveSettings('init', jsonData.record);
+                        Main.getMainWindow().webContents.send('desktopRecord', jsonData.record);
                     } else if (jsonData.window) {
                         if (jsonData.window.lock) {
                             Main.getMainWindow().webContents.send('lock', 1);
@@ -172,9 +173,10 @@ ipcMain.on('requestDesktopInfo', (event, arg) => {
     client.write(JSON.stringify({ requestDesktopInfo: true, client: os.hostname() }));
 });
 
-ipcMain.on('init', (event, arg) => {  
-    Main.getMainWindow().webContents.send('init', configuration.readSettings('init'));
-    configuration.saveSettings('init', {});
+ipcMain.on('askForDesktopRecord', (event, arg) => {  
+    // Main.getMainWindow().webContents.send('init', configuration.readSettings('init'));
+    // configuration.saveSettings('init', {});
+    client.write(JSON.stringify({ init: true, client: os.hostname() }));
 });
 
  module.exports = CyberClient;

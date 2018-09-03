@@ -39,7 +39,7 @@ $(document).ready(function () {
         ipcRenderer.send('requestDesktopInfo', 1);
     }
 
-    ipcRenderer.send('init', 1);
+    ipcRenderer.send('askForDesktopRecord', 1);
 });
 
 /**
@@ -149,8 +149,12 @@ ipcRenderer.on('desktopInfo', (event, arg) => {
     sessionStorage.setItem('desktopInfo', JSON.stringify(desktopInfo));
 });
 
-// Close and update status if the app is closed
-ipcRenderer.on('init', (event, arg) => {  
+/**
+ * Recibe los datos de registro de la maquina, si esta en uso
+ * se iniciara el reloj con respecto a los datos almacenados
+ * en base de datos
+ */
+ipcRenderer.on('desktopRecord', (event, arg) => {  
     setClockBasedOnLatestRecord(arg);
 });
 

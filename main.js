@@ -106,7 +106,7 @@ var Main = {
       }
     });
 
-    appIcon.setToolTip('Skynet client')
+    appIcon.setToolTip('Skynet client');
     //appIcon.setContextMenu(contextMenu)
     
   },
