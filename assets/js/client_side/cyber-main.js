@@ -248,3 +248,8 @@ function setClockBasedOnLatestRecord(latestRecord) {
         }
     }
 }
+
+// evitar que cierren la aplicacion
+window.onbeforeunload = (e) => {
+    e.returnValue = false;
+}
