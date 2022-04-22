@@ -49,7 +49,7 @@
     "jquery-countdown": "2.2.0",
     "lock-your-windows": "0.0.0",
     "moment": "2.22.2",
-    "nconf": "0.10.0",
+    "nconf": "0.11.4",
     "request": "2.81.0",
     "robotjs": "0.5.1",
     "rollup": "0.52.3",
